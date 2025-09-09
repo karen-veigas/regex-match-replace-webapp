@@ -31,10 +31,8 @@ class ProcessFileView(APIView):
 
         file_path = user.file.path
         df = pd.read_csv(file_path)
-        print(df.head())
         
         col = request.data.get("column").capitalize()
-        print(col)
         
         if not col:
             return Response({"message": "Error: Field column not provided.",}, status= status.HTTP_400_BAD_REQUEST)
@@ -42,7 +40,6 @@ class ProcessFileView(APIView):
             return Response({"message": "Error: Column not found.",}, status= status.HTTP_400_BAD_REQUEST)
        
         replace_str = request.data.get("replace_str")
-        print(replace_str)
         if replace_str is None or replace_str is "":
             return Response({"message": "Error: Field replace_str not provided.",}, status= status.HTTP_400_BAD_REQUEST)
             
