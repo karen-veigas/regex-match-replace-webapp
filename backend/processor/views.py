@@ -1,3 +1,4 @@
+import re
 from django.shortcuts import render
 
 import pandas as pd
@@ -30,11 +31,28 @@ class ProcessFileView(APIView):
 
         file_path = user.file.path
         df = pd.read_csv(file_path)
-
-
+        print(df.head())
+        
+        col = request.data.get("column").capitalize()
+        print(col)
+        
+        if not col:
+            return Response({"message": "Error: Field column not provided.",}, status= status.HTTP_400_BAD_REQUEST)
+        if col not in df.columns:
+            return Response({"message": "Error: Column not found.",}, status= status.HTTP_400_BAD_REQUEST)
+       
+        replace_str = request.data.get("replace_str")
+        print(replace_str)
+        if replace_str is None or replace_str is "":
+            return Response({"message": "Error: Field replace_str not provided.",}, status= status.HTTP_400_BAD_REQUEST)
+            
+        regex = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,7}\b"
+        
+        df[col] = df[col].apply( lambda x: re.sub(regex, str(replace_str), x))
+            
         return Response({
             "message": "Success",
-            "data": df.head()
+            "data": df
         }, status= status.HTTP_200_OK)
         
 
