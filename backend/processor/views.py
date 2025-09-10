@@ -22,9 +22,9 @@ class UploadFileView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class ProcessFileView(APIView):
+class ReplaceFileView(APIView):
 
-    def get(self, request):
+    def post(self, request):
         user = User.objects.first()
         if not user or not user.file:
             return Response({"error": "No file found for the first user"}, status=404)
@@ -32,7 +32,7 @@ class ProcessFileView(APIView):
         file_path = user.file.path
         df = pd.read_csv(file_path)
         
-        col = request.data.get("column").capitalize()
+        col = request.data.get("column")
         
         if not col:
             return Response({"message": "Error: Field column not provided.",}, status= status.HTTP_400_BAD_REQUEST)
@@ -45,7 +45,7 @@ class ProcessFileView(APIView):
             
         regex = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,7}\b"
         
-        df[col] = df[col].apply( lambda x: re.sub(regex, str(replace_str), x))
+        df[col] = df[col].apply( lambda x: re.sub(regex, str(replace_str.capitalize()), x))
             
         return Response({
             "message": "Success",
