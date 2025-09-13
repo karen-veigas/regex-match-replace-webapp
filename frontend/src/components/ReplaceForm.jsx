@@ -18,7 +18,7 @@ function ReplaceData({ onComplete }) {
             const res = await axios.post(`${url}api/replace-data/`, formData,
             );
 
-            onComplete(res.data.processed_data);
+            // onComplete(res.data.processed_data);
             console.log(res.data)
         } catch (err) {
             console.error(err);
