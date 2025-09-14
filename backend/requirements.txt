@@ -1,0 +1,6 @@
+Django>=5.0
+djangorestframework
+pandas
+openai
+django-environ
+django-cors-headers
