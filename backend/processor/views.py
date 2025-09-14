@@ -1,4 +1,5 @@
 import re
+from django.db import Error
 from django.shortcuts import render
 
 import pandas as pd
@@ -34,31 +35,41 @@ class ReplaceFileView(APIView):
             return Response({"error": "No file found for the first user"}, status=404)
 
         file_path = user.file.path
-        df = pd.read_csv(file_path)
-        
-        col = request.data.get("column")
-        
-        if not col:
-            return Response({"message": "Error: Field column not provided.",}, status= status.HTTP_400_BAD_REQUEST)
-        if col not in df.columns:
-            return Response({"message": "Error: Column not found.",}, status= status.HTTP_400_BAD_REQUEST)
-       
-        replace_str = request.data.get("replace_str")
-        if replace_str is None or replace_str == "":
-            return Response({"message": "Error: Field replace_str not provided.",}, status= status.HTTP_400_BAD_REQUEST)
-        
+        if file_path.endswith(".csv"):
+            df = pd.read_csv(file_path)
+        elif file_path.endswith(".xlsx"):
+            df = pd.read_excel(file_path)
+        else:
+            return Response({"message": "Incorrect File format"}, status= status.HTTP_400_BAD_REQUEST)
+            
         nl_prompt = request.data.get("prompt")
         if not nl_prompt:
             return Response({"message": "Error: Field prompt not provided."}, status= status.HTTP_400_BAD_REQUEST)
-
-        res = nl_str_to_regex(nl_prompt)
-        res = res.strip('`').strip('"').strip("'").strip()
         
-        df[col] = df[col].apply( lambda x: re.sub(res, str(replace_str.capitalize()), x))
+        try:
+            res = nl_str_to_regex(nl_prompt)
+        
+            col = res['column'].capitalize()
             
-        return Response({
-            "message": "Success",
-            "data": df
-        }, status= status.HTTP_200_OK)
-        
+            if col not in df.columns:
+                return Response({"message": f"Error: Column '{col}' not found."}, status=status.HTTP_400_BAD_REQUEST)
+
+            regex = res['regex'].strip('`').strip('"').strip("'").strip()
+            
+            if not regex:
+                return Response({"message": "Error: Regex pattern not generated."}, status=status.HTTP_400_BAD_REQUEST)
+            
+            replacement_str = res['replacement_str']
+            
+            df[col] = df[col].apply( lambda x: re.sub(regex, str(replacement_str), x))
+                
+            return Response({
+                "message": "Success",
+                "data": df
+            }, status= status.HTTP_200_OK)
+            
+            
+        except Exception as e:
+            return Response({"message": "Error formulating response. Please try again later."}, status= status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
 
