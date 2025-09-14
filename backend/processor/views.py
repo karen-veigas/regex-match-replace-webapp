@@ -12,14 +12,10 @@ from processor.models import User
 
 from processor.serializers import FileUploadSerializer
 
-from openai import OpenAI
-# client = OpenAI(api_key= )
-
 class UploadFileView(APIView):
     serializer_class = FileUploadSerializer
     
     def post(self, request):
-        # Assume authenticated user
         request.user = User.objects.first()
         serializer = self.serializer_class(request.user, data = request.data)
         if serializer.is_valid():
