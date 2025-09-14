@@ -8,9 +8,10 @@ const { Dragger } = Upload;
 
 
 
-function FileUpload({ onUploaded, onError, loading, setLoading }) {
+function FileUpload({ onUploaded, onError }) {
   const url = import.meta.env.VITE_BASE_URL;
   const [file, setFile] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleFileChange = ({ file }) => {
     setFile(file);

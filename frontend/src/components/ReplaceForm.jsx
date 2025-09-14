@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { Form, Input, Button } from "antd";
 import axios from "axios";
 
-function ReplaceData({ onReplaced, onError, loading, setLoading }) {
+function ReplaceData({ onReplaced, onError, }) {
     const url = import.meta.env.VITE_BASE_URL;
+
+    const [loading, setLoading] = useState(false);
 
     const handleFinish = async (values) => {
         setLoading(true);

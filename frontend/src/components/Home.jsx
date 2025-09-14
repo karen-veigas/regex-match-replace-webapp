@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Card, Space, Typography, message } from "antd";
+import { Card, Space, Typography, Alert  } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import FileUpload from "../components/FileUpload";
 import ReplaceForm from "../components/ReplaceForm";
@@ -11,10 +11,18 @@ const { Title, Text } = Typography;
 
 export default function Home() {
   const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState("info"); 
+  const [alertVisible, setAlertVisible] = useState(false);
 
-  const handleError = (msg) => {
-    message.error(msg);
+  const showAlert = (message, type = "info") => {
+    setAlertMessage(message);
+    setAlertType(type);
+    setAlertVisible(true);
+  };
+
+  const closeAlert = () => {
+    setAlertVisible(false);
   };
 
   return (
@@ -49,23 +57,33 @@ export default function Home() {
           </div>
         </Space>
 
+        {alertVisible && (
+          <Alert
+            message={alertMessage}
+            type={alertType}
+            closable
+            showIcon
+            style={{ marginBottom: "1rem" }}
+            onClose={closeAlert}
+          />
+        )}
+
         <Title level={5} style={{ marginTop: "1.5rem" }}>
           Upload File : 
         </Title>
         <FileUpload
-          onUploaded={(d) => setData(d)}
-          onError={handleError}
-          loading={loading}
-          setLoading={setLoading}
+          onUploaded={(d) => {setData(d)
+            showAlert("File uploaded successfully!", "success");}}
+          onError={(msg) => showAlert(msg, "error")}
+          
         />
         <Title level={5} style={{ marginTop: "2rem" }}>
           Enter your prompt: 
         </Title>
         <ReplaceForm
-          onReplaced={(d) => setData(d)}
-          onError={handleError}
-          loading={loading}
-          setLoading={setLoading}
+          onReplaced={(d) => {setData(d)
+            showAlert("Replacement applied successfully!", "success");}}
+          onError={(msg) => showAlert(msg, "error")}
         />
         {data && (
           <>
