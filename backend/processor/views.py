@@ -34,9 +34,11 @@ class ReplaceFileView(APIView):
         if file_path.endswith(".csv"):
             df = pd.read_csv(file_path)
         elif file_path.endswith(".xlsx"):
-            df = pd.read_excel(file_path)
+            df = pd.read_excel(file_path, header=1)
         else:
             return Response({"message": "Incorrect File format"}, status= status.HTTP_400_BAD_REQUEST)
+        
+        
             
         nl_prompt = request.data.get("prompt")
         if not nl_prompt:
@@ -68,4 +70,4 @@ class ReplaceFileView(APIView):
         except Exception as e:
             return Response({"message": "Error formulating response. Please try again later."}, status= status.HTTP_500_INTERNAL_SERVER_ERROR)
             
-
+      
