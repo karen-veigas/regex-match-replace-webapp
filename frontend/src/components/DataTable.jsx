@@ -1,12 +1,6 @@
+// src/components/DataTable.jsx
 import React from "react";
-import {
-  CTable,
-  CTableHead,
-  CTableRow,
-  CTableHeaderCell,
-  CTableBody,
-  CTableDataCell,
-} from "@coreui/react";
+import { Table } from "antd";
 
 export default function DataTable({ data }) {
   if (!data) return null;
@@ -31,35 +25,19 @@ export default function DataTable({ data }) {
     rowData = data;
   }
 
-  const columns = Object.keys(rowData[0] ?? {});
+  const columns = Object.keys(rowData[0] ?? {}).map((col) => ({
+    title: col,
+    dataIndex: col,
+    key: col,
+  }));
 
   return (
-    <div className="table-wrapper">
-      <CTable
-  bordered
-  striped
-  hover
-  responsive
-  className="align-middle text-sm shadow-sm"
->
-        <CTableHead color="light">
-          <CTableRow>
-            {columns.map((col) => (
-              <CTableHeaderCell key={col}>{col}</CTableHeaderCell>
-            ))}
-          </CTableRow>
-        </CTableHead>
-
-        <CTableBody>
-          {rowData.map((row, rIdx) => (
-            <CTableRow key={rIdx}>
-              {columns.map((col) => (
-                <CTableDataCell key={col}>{String(row[col] ?? "")}</CTableDataCell>
-              ))}
-            </CTableRow>
-          ))}
-        </CTableBody>
-      </CTable>
-    </div>
+    <Table
+      dataSource={rowData}
+      columns={columns}
+      pagination={{ pageSize: 5 }}
+      bordered
+      size="middle"
+    />
   );
 }

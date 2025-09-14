@@ -1,19 +1,15 @@
 import React, { useState } from "react";
-import { CForm, CFormLabel, CFormInput, CButton, CRow, CCol, CSpinner } from "@coreui/react";
+import { Form, Input, Button } from "antd";
 import axios from "axios";
 
-function ReplaceData({ onReplaced, onError }) {
+function ReplaceData({ onReplaced, onError, loading, setLoading }) {
     const url = import.meta.env.VITE_BASE_URL;
-    const [prompt, setPrompt] = useState("");
 
-    const [loading, setLoading] = useState(false)
-
-    const handleReplace = async () => {
-        if ( !prompt ) return onError?.("All fields are required.");
+    const handleFinish = async (values) => {
         setLoading(true);
 
         const formData = new FormData();
-        formData.append("prompt", prompt);
+        formData.append("prompt", values.pattern);
 
         try {
 
@@ -29,20 +25,26 @@ function ReplaceData({ onReplaced, onError }) {
     };
 
     return (
-        <CForm>
-            <CRow className="mb-3 gx-3">
+        <Form layout="vertical" onFinish={handleFinish}>
+            <Form.Item
+                label=""
+                name="pattern"
+                rules={[{ required: true, message: "Please enter a pattern!" }]}
+            >
+                <Input placeholder='e.g. "Find email addresses in the Email column and replace
+them with REDACTED."' />
+            </Form.Item>
 
-                <CCol md={4}>
-                    <CFormLabel>Pattern (natural language)</CFormLabel>
-                    <CFormInput value={prompt} onChange={(e) => setPrompt(e.target.value)} placeholder='e.g. "Find emails"' />
-                </CCol>
-
-            </CRow>
-
-            <CButton color="success" onClick={handleReplace} disabled={loading}>
-                {loading ? (<><CSpinner size="sm" /> Applying...</>) : "Apply Replacement"}
-            </CButton>
-        </CForm>
+            <div style={{ textAlign: "right" }}>
+                <Button
+                    type="primary"
+                    htmlType="submit"
+                    loading={loading}
+                >
+                    Apply Replacement
+                </Button>
+            </div>
+        </Form>
     );
 }
 
