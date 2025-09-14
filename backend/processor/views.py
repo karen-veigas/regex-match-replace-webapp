@@ -6,9 +6,13 @@ from rest_framework.decorators import api_view, parser_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
+from processor.utils import nl_str_to_regex
 from processor.models import User
 
 from processor.serializers import FileUploadSerializer
+
+from openai import OpenAI
+# client = OpenAI(api_key= )
 
 class UploadFileView(APIView):
     serializer_class = FileUploadSerializer
@@ -40,12 +44,17 @@ class ReplaceFileView(APIView):
             return Response({"message": "Error: Column not found.",}, status= status.HTTP_400_BAD_REQUEST)
        
         replace_str = request.data.get("replace_str")
-        if replace_str is None or replace_str is "":
+        if replace_str is None or replace_str == "":
             return Response({"message": "Error: Field replace_str not provided.",}, status= status.HTTP_400_BAD_REQUEST)
-            
-        regex = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,7}\b"
         
-        df[col] = df[col].apply( lambda x: re.sub(regex, str(replace_str.capitalize()), x))
+        nl_prompt = request.data.get("prompt")
+        if not nl_prompt:
+            return Response({"message": "Error: Field prompt not provided."}, status= status.HTTP_400_BAD_REQUEST)
+
+        res = nl_str_to_regex(nl_prompt)
+        res = res.strip('`').strip('"').strip("'").strip()
+        
+        df[col] = df[col].apply( lambda x: re.sub(res, str(replace_str.capitalize()), x))
             
         return Response({
             "message": "Success",
