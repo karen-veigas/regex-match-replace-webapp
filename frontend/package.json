@@ -10,12 +10,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ant-design/icons": "^6.0.2",
     "@coreui/coreui": "^5.4.3",
     "@coreui/react": "^5.8.0",
+    "antd": "^5.27.3",
     "axios": "^1.11.0",
     "bootstrap": "^5.3.8",
+    "less": "^4.4.1",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "vite-plugin-imp": "^2.4.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",

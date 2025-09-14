@@ -1,66 +1,81 @@
 import React, { useState } from "react";
-import {
-  CContainer,
-  CCard,
-  CCardHeader,
-  CCardBody,
-  CAlert
-} from "@coreui/react";
+import { Card, Space, Typography, message } from "antd";
+import { UploadOutlined } from "@ant-design/icons";
 import FileUpload from "../components/FileUpload";
 import ReplaceForm from "../components/ReplaceForm";
 import DataTable from "../components/DataTable";
+
 import RhombusAILogo from "../components/icons/rhombus_ai_logo.jpeg";
 
+const { Title, Text } = Typography;
 
 export default function Home() {
   const [data, setData] = useState(null);
-  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleError = (msg) => {
+    message.error(msg);
+  };
 
   return (
-    <div className="page-wrapper">
-      <CCard className="card-wrapper">
-        <CCardHeader className="header-row">
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <img
-              src={RhombusAILogo}
-              alt="Rhombus AI Logo"
-              width={50}
-              height={50}
-              style={{ borderRadius: "6px" }}
-            />
-            <div>
-              <h3 className="page-title">Regex Pattern Matching & Replacement</h3>
-              <div className="subtitle">Upload CSV/Excel → describe the pattern → replace & preview</div>
-            </div>
+
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#f0f5ff",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "2rem",
+      }}
+    >
+      <Card
+        style={{ maxWidth: 900, width: "100%" }}
+        bodyStyle={{ padding: "2rem" }}
+      >
+        <Space align="center" style={{ marginBottom: "1.5rem" }}>
+          <img
+            src={RhombusAILogo}
+            alt="Rhombus AI Logo"
+            style={{ width: 50, height: 50, borderRadius: 8 }}
+          />
+          <div>
+            <Title level={3} style={{ margin: 0, color: "#1d4ed8" }}>
+              Regex Pattern Matching & Replacement
+            </Title>
+            <Text type="secondary">
+              Upload CSV/Excel → Enter Your Prompt → Replace & Preview
+            </Text>
           </div>
-        </CCardHeader>
+        </Space>
 
-        <CCardBody>
-          {error && <CAlert color="danger" onClose={() => setError("")}>{error}</CAlert>}
-          <div className="container-fluid">
-
-            <section>
-              <h5>
-                1. Upload file
-              </h5>
-              <FileUpload onUploaded={(d) => { setData(d); setError(""); }} onError={(msg) => setError(msg)} />
-            </section>
-
-            <section style={{ marginBottom: 20 }}>
-              <h5>2. Pattern matching</h5>
-              <ReplaceForm onReplaced={(d) => { setData(d); setError(""); }} onError={(msg) => setError(msg)} />
-            </section>
-
-            {data && (
-              <>
-                <h5 style={{ marginTop: 8 }}>3. Processed data</h5>
-                <DataTable data={data} />
-              </>
-            )}
-
-          </div>
-        </CCardBody>
-      </CCard>
+        <Title level={5} style={{ marginTop: "1.5rem" }}>
+          Upload File : 
+        </Title>
+        <FileUpload
+          onUploaded={(d) => setData(d)}
+          onError={handleError}
+          loading={loading}
+          setLoading={setLoading}
+        />
+        <Title level={5} style={{ marginTop: "2rem" }}>
+          Enter your prompt: 
+        </Title>
+        <ReplaceForm
+          onReplaced={(d) => setData(d)}
+          onError={handleError}
+          loading={loading}
+          setLoading={setLoading}
+        />
+        {data && (
+          <>
+            <Title level={5} style={{ marginTop: "2rem" }}>
+              Preview: 
+            </Title>
+            <DataTable data={data} />
+          </>
+        )}
+      </Card>
     </div>
   );
 }

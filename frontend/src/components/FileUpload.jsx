@@ -1,14 +1,21 @@
 
 import React, { useState } from "react";
-import { CForm, CFormLabel, CFormInput, CButton, CRow, CCol, CSpinner } from "@coreui/react";
-
+import { Upload, Button, Space, message } from "antd";
+import { UploadOutlined } from "@ant-design/icons";
 import axios from "axios";
 
+const { Dragger } = Upload;
 
-function FileUpload({ onUploaded, onError }) {
+
+
+function FileUpload({ onUploaded, onError, loading, setLoading }) {
   const url = import.meta.env.VITE_BASE_URL;
   const [file, setFile] = useState(null);
-  const [loading, setLoading] = useState(false);
+
+  const handleFileChange = ({ file }) => {
+    setFile(file);
+  };
+
 
   const handleUpload = async () => {
     if (!file) return onError?.("Please select a file.");
@@ -29,31 +36,36 @@ function FileUpload({ onUploaded, onError }) {
   };
 
   return (
-    <CForm>
-      <CRow className="align-items-end gx-3">
-        <CCol xs={12} md={8}>
-          <CFormLabel htmlFor="fileInput">Choose file (CSV / Excel)</CFormLabel>
-          <CFormInput
-            id="fileInput"
-            type="file"
-            accept=".csv,.xlsx"
-            onChange={(e) => setFile(e.target.files?.[0] || null)}
-          />
-        </CCol>
+    <>
+      <Dragger
+        file={file}
+        onChange={handleFileChange}
+        beforeUpload={() => false}
+        multiple={false}
+        accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        style={{ padding: "1rem" }}
+      >
+        <p className="ant-upload-drag-icon">
+          <UploadOutlined style={{ fontSize: 32, color: "#2563eb" }} />
+        </p>
+        <p className="ant-upload-text">
+          Click or drag file to this area to upload
+        </p>
+        <p className="ant-upload-hint">
+          Supports CSV or Excel files only
+        </p>
+      </Dragger>
 
-        <CCol xs={12} md={4}>
-          <CButton color="primary" className="w-100 mt-3" onClick={handleUpload} disabled={loading}>
-            {loading ? (
-              <>
-                <CSpinner size="sm" /> Uploading...
-              </>
-            ) : (
-              "Upload"
-            )}
-          </CButton>
-        </CCol>
-      </CRow>
-    </CForm>
+      <div style={{ textAlign: "right", marginTop: "1rem" }}>
+        <Button
+          type="primary"
+          onClick={handleUpload}
+          loading={loading}
+        >
+          Upload File
+        </Button>
+      </div>
+    </>
   );
 }
 
