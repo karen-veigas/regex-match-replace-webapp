@@ -20,7 +20,7 @@ function ReplaceData({ onReplaced, onError, }) {
 
             onReplaced?.(res.data?.data);
         } catch (err) {
-            onError?.("Replacement failed. " + (err?.message || ""));
+            onError?.("Replacement failed. " + (err.response?.data?.message || err.message));
         } finally {
             setLoading(false);
         }

@@ -30,7 +30,7 @@ function FileUpload({ onUploaded, onError }) {
 
       onUploaded?.(data);
     } catch (err) {
-      onError?.("Upload failed. " + (err?.message || ""));
+      onError?.("Upload failed. " + (err.response?.data?.message || err.message));
     } finally {
       setLoading(false);
     }
